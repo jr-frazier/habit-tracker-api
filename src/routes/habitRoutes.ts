@@ -2,10 +2,10 @@ import { Router } from "express";
 import {z} from "zod";
 import {validateBody, validateParams} from "../middleware/validation.ts";
 import {authenticatedToken} from "../middleware/auth.ts";
+import {createHabit, getHabit, getHabits, updateHabit} from "../controllers/habitController.ts";
+import {createHabitSchema, updateHabitSchema} from "../db/schema.ts";
 
-const createHabitSchema = z.object({
-    name: z.string().min(1),
-}).strict()
+
 
 const completeParamsSchema = z.object({
     id: z.string()
@@ -16,21 +16,14 @@ const router = Router();
 // Apply the authentication middleware to all routes in this router
 router.use(authenticatedToken)
 
-router.get('/', (req, res) => {
-    res.status(200).json({ message: 'Habits retrieved successfully' });
-})
+router.get('/', getHabits)
 
-router.get('/:id', (req, res) => {
-    res.status(200).json({ message: 'Habit retrieved successfully' });
-})
+router.get('/:id', getHabit)
 
-router.post('/', validateBody(createHabitSchema) ,(req, res) => {
-    res.status(201).json({ message: 'Habit created successfully' });
-})
+// POST: Create New Habit
+router.post('/', validateBody(createHabitSchema) ,(createHabit))
 
-router.put('/:id', (req, res) => {
-    res.status(200).json({ message: 'Habit updated successfully' });
-})
+router.put('/:id',validateBody(updateHabitSchema), updateHabit)
 
 router.delete('/:id', (req, res) => {
     res.status(200).json({ message: 'Habit deleted successfully' });

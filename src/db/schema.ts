@@ -56,7 +56,7 @@ export const tags = pgTable('tags', {
 })
 
 
-export const habitTags = pgTable('habit_tags', {
+export const habitTags = pgTable('habitTags', {
     id: uuid('id').primaryKey().defaultRandom(),
     habitId: uuid('habit_id')
         .references(() => habits.id, { onDelete: 'cascade'}).notNull(),
@@ -76,7 +76,7 @@ export const habitsRelations = relations(habits, ({one, many}) => ({
         references: [users.id]
     }),
     entries: many(entries),
-    tags: many(tags),
+    habitTags: many(habitTags),
 }))
 
 export const entriesRelations = relations(entries, ({one}) => ({
@@ -90,7 +90,7 @@ export const tagsRelations = relations(tags, ({many}) => ({
     habitTags: many(habitTags),
 }))
 
-export const habbitTagsRelations = relations(habitTags, ({one}) => ({
+export const habitTagsRelations = relations(habitTags, ({one}) => ({
     tag: one(tags, {
         fields: [habitTags.tagId],
         references: [tags.id]
@@ -101,8 +101,12 @@ export const habbitTagsRelations = relations(habitTags, ({one}) => ({
     }),
 }))
 
+
+
+
 export type NewUser = typeof users.$inferInsert
 export type User = typeof users.$inferSelect
+export type NewHabit = typeof habits.$inferInsert
 export type Habit = typeof habits.$inferSelect
 export type Entry = typeof entries.$inferSelect
 export type Tag = typeof tags.$inferSelect
@@ -110,6 +114,23 @@ export type HabbitTag = typeof habitTags.$inferSelect
 
 export const insertUserSchema = createInsertSchema(users)
 export const selectUserSchema = createSelectSchema(users)
+export const insertHabitSchema = createInsertSchema(habits)
+
+export const createHabitSchema = insertHabitSchema
+    .omit({id: true, userId: true, createdAt: true, updatedAt: true, isActive: true})
+    .extend({
+        name: z.string().min(2).max(100),
+        tagIds: z.array(z.string()).optional()
+    })
+
+export const updateHabitSchema = insertHabitSchema
+    .omit({id: true, userId: true, createdAt: true, updatedAt: true, isActive: true})
+    .extend({
+        name: z.string().min(2).max(100).optional(),
+        frequency: z.string().min(2).max(20).optional(),
+        targetCount: z.number().optional(),
+        tagIds: z.array(z.string()).optional()
+    })
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type SelectUser = z.infer<typeof selectUserSchema>;

@@ -7,6 +7,7 @@ import cors from 'cors'
 import morgan from 'morgan'
 import helmet from 'helmet'
 import {isTest} from "../env.ts";
+import {APIError, errorHandler} from "./middleware/errorHandler.ts";
 
 const app = express();
 app.use(helmet())
@@ -17,7 +18,6 @@ app.use(morgan('dev', {
     skip: (req, res) => isTest(),
 }))
 
-
 app.get('/health', (req, res) => {
     res.json({ status: 'ok' });
 })
@@ -26,5 +26,6 @@ app.use('/api/auth', authRoutes );
 app.use('/api/users', userRoutes );
 app.use('/api/habits', habitRoutes );
 app.use('/api/test', testRoute)
+app.use(errorHandler)
 
 export default app;
