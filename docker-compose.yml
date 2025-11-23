@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: habit_tracker_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: habits
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: .
+    container_name: habit_tracker_api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      APP_STAGE: dev
+      PORT: 3000
+      # IMPORTANT: Set a strong secret in real use
+      JWT_SECRET: "dev-secret-please-change-32-chars-minimum-1234"
+      JWT_EXPIRES_IN: "7d"
+      BCRYPT_ROUNDS: 12
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/habits
+    ports:
+      - "3000:3000"
+
+volumes:
+  db_data:

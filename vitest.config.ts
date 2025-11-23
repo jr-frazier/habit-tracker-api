@@ -11,7 +11,9 @@ export default defineConfig({
         restoreMocks: true,
         // Ensure tests run sequentially to avoid database conflicts
         pool: 'threads',
-        maxWorkers: 1
+        maxWorkers: 1,
+        include: ['**/*.test.ts', '**/*.spec.ts'],
+        setupFiles: ['./tests/setup/globalSetup.ts'],
     },
     plugins: [],
 })

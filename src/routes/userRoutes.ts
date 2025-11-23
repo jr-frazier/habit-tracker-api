@@ -3,6 +3,11 @@ import {authenticatedToken} from "../middleware/auth.ts";
 
 const router = Router();
 
+router.post('/', (req, res) => {
+    res.status(201).json({ message: 'User created successfully' });
+})
+
+
 router.use(authenticatedToken)
 
 router.get('/', (req, res) => {

@@ -142,3 +142,13 @@ export const updateHabit = async (req: AuthenticatedRequest, res: Response) => {
     }
 }
 
+export const deleteHabit = async (req: AuthenticatedRequest, res: Response) => {
+    try {
+        await db.delete(habits).where(and(eq(habits.id, req.params.id), eq(habits.userId, req.user.id)));
+        res.status(204).end();
+    } catch (error) {
+        console.error('Error deleting habit:', error);
+        res.status(500).json({error: 'Failed to delete habit'});
+    }
+}
+
